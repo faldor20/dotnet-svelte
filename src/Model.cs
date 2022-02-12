@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
 namespace Library.Models
@@ -44,16 +46,15 @@ namespace Library.Models
     {
         public int Id { get; set; }
         public BookListing Listing { get; set; }
+
         public LoanInfo? LoanInfo { get; set; }
 
     }
+//This annotation makes this flattened into the parent instead of being it's
+    
     public class LoanInfo{
-        public LoanInfo(DateOnly loanedDate, User LoanedUser)
-        {
-            LoanedDate = loanedDate;
-            this.LoanedUser = LoanedUser;
-        }
-
+        [Key]
+        public int Id { get; set; }
         public DateOnly LoanedDate { get; set; }
         public User LoanedUser { get; set; }
 
@@ -61,12 +62,11 @@ namespace Library.Models
     public class User
     {
         public int Id { get; set; }
-        public List<Book> BorrowedBooks { get; set; } =new();
+        public List<Book> LoanedBooks { get; set; } =new();
         /// <summary>
         /// List of bookListingIDs. NOT bookIDs
         /// </summary>
-        public List<int> ReservedBooks { get; set; } = new();
-        public DateOnly? LoanedDate { get; set;}
+        //public List<int> ReservedBooks { get; set; } = new();
 
     }
 }

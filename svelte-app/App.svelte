@@ -1,32 +1,38 @@
-<script lang="ts">
-	import "./App.css";
-	export let name: string;
-	
+<script>
+  import Router from 'svelte-spa-router'
+  import routes from "./routes";
+  import "./App.css";
 </script>
 
+
+  <header>
+  <!-- 	<div class="corner">
+      <a href="https://kit.svelte.dev">
+      </a>
+    </div> -->
+    <ul>
+    <li><a href="#/">Home</a></li>
+    <li><a href="#/BookSearch">BookSearch</a></li>
+
+</ul>
+
+
+</header>
+
 <main>
-	<h1>Hello {name}!</h1>
-	<p>Visit the <a href="https://svelte.dev/tutorial">Svelte tutorial</a> to learn how to build Svelte apps.</p>
-</main>
-<style lang="postcss">
+    <Router {routes}/>
+    
+    </main>
+    
+    <footer>
+      <p>visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to learn SvelteKit</p>
+    </footer>
 
-main {
-	text-align: center;
-	padding: 1em;
-	max-width: 240px;
-	margin: 0 auto;
-}
-
-h1 {
-	color: #ff3e00;
-	text-transform: uppercase;
-	font-size: 4em;
-	font-weight: 100;
-}
-
-@media (min-width: 640px) {
-	main {
-		max-width: none;
-	}
-}
+<style>
+    main{
+        @apply object-fill max-h-full;
+    }
+    footer{
+        @apply align-bottom;
+    }
 </style>

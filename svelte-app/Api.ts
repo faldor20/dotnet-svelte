@@ -27,6 +27,9 @@ export interface Book {
 }
 
 export interface LoanInfo {
+  /** @format int32 */
+  id?: number;
+
   /** @format date */
   loanedDate?: string;
   loanedUser?: User;
@@ -35,11 +38,7 @@ export interface LoanInfo {
 export interface User {
   /** @format int32 */
   id?: number;
-  borrowedBooks?: Book[];
-  reservedBooks?: number[];
-
-  /** @format date */
-  loanedDate?: string | null;
+  loanedBooks?: Book[];
 }
 
 export type QueryParamsType = Record<string | number, any>;
@@ -298,6 +297,22 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       this.request<File, any>({
         path: `/api/Library/return/${bookId}`,
         method: "POST",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Library
+     * @name LibraryGetUserIds
+     * @request GET:/api/Library/userIds
+     */
+    libraryGetUserIds: (query?: { bookId?: number }, params: RequestParams = {}) =>
+      this.request<number[], any>({
+        path: `/api/Library/userIds`,
+        method: "GET",
+        query: query,
+        format: "json",
         ...params,
       }),
   };

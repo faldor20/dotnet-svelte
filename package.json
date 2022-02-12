@@ -29,6 +29,7 @@
     "fp-ts": "^2.11.8",
     "postcss": "^7",
     "sirv-cli": "^2.0.0",
+    "svelte-spa-router": "^3.2.0",
     "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.2.17"
   }
 }

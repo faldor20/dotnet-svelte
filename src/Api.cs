@@ -3,6 +3,8 @@ using System.Net;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
 using Library.Models;
+using Microsoft.EntityFrameworkCore;
+
 namespace Library.Api
 {
     [Route("api/[controller]")]
@@ -19,7 +21,7 @@ namespace Library.Api
         [HttpGet]
         public BookListing[] GetBooksByTitle(string title)
         {
-            return _context.BookListings.Where(book => book.Title.Contains(title)).ToArray();
+            return _context.BookListings.Where(book => book.Title.ToLower().Contains(title.ToLower())).Include((x)=>x.Books).ToArray();
             
         }
 
@@ -33,8 +35,8 @@ namespace Library.Api
             var user = await _context.Users.FindAsync(userId);
             if (user is null) return NotFound($"Could not find userID{userId}");
 
-            book.LoanInfo = new LoanInfo( DateOnly.FromDateTime(DateTime.Now),user);
-            user.ReservedBooks.Add(bookId);
+            book.LoanInfo = new LoanInfo { LoanedDate= DateOnly.FromDateTime(DateTime.Now),LoanedUser= user};
+            user.LoanedBooks.Add(book);
 
             await _context.SaveChangesAsync();
             return Ok();
@@ -52,13 +54,22 @@ namespace Library.Api
             if (user is null) return NotFound($"Could not find loadned user");
             
             book.LoanInfo = null;
-            user?.BorrowedBooks.Remove(book);
+            user?.LoanedBooks.Remove(book);
 
             await _context.SaveChangesAsync();
             return Ok();
 
 
-        }        
+        }
+        [HttpGet("userIds")]   // GET /api/test2/xyz
+        public int[] GetUserIds(int bookId)
+        {   var dbUsers = _context.Users;
+            var users= dbUsers.Select(x => x.Id).ToArray();
+            Console.WriteLine($"got {users.Length} from {dbUsers.Count()} users");
+            return users;
+
+
+        }
 
     }
 }

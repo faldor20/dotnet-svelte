@@ -1,7 +1,3 @@
-/node_modules/
-/public/build/
-wwwroot/build
-.DS_Store
 .fable/
 .fake/
 .farmer/
@@ -9,8 +5,8 @@ wwwroot/build
 .ionide/
 .vs/
 deploy/
-**obj/
-**bin/
+obj/
+bin/
 packages/
 paket-files/
 node_modules/
@@ -19,6 +15,3 @@ release.sh
 *.orig
 *.DotSettings.user
 *.fs.js
-bin/
-
-obj/
