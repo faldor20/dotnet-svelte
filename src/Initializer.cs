@@ -18,7 +18,7 @@ namespace Library.Data
 
             var listings = new BookListing[]
             {
-                new BookListing{Title="Hyperion", Author="dan symmons", Description="An experiential novel telling the story of 5 travelers brought together to tell their own stories",}
+                new BookListing{Title="Hyperion", Author="dan symmons", Description="An experiential novel telling the story of 5 travelers brought together to tell their own stories\n This may be a scifi novel on the surface but in truth it is many stories from many walks of life all interlinked by a sinlge thread. The true joy of hyperion comes from unravveling that thread from the tapestry of these disparate chactors lives",}
             };
 
             var books = new List<Book>();
@@ -26,8 +26,8 @@ namespace Library.Data
             foreach (BookListing s in listings)
             {
                 var thisBooks = new List<Book>{
-                    new Book{Listing=s},
-                    new Book{Listing=s}
+                    new Book{BookListing=s,BookListingId=s.Id},
+                    new Book{BookListing=s,BookListingId=s.Id}
                 };
                 count += 2;
                 books.AddRange(thisBooks);

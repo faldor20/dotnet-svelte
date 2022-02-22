@@ -26,46 +26,54 @@ namespace Library
             services.AddDbContext<LibraryContext>(opt =>
                 opt.UseSqlite("Data Source=Database.db")
                 );
-                
+            services.AddCors();
+
             services.AddControllersWithViews().AddNewtonsoftJson(options =>
                 options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
             );
 
             services.AddOpenApiDocument();
 
-            // In production, the Angular files will be served from this directory
+/*             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
             {
                 configuration.RootPath = "wwwroot";
-            });
+            }); */
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseHttpLogging();
+            app.UseCors(options =>
+            {
+                options.AllowAnyMethod().AllowAnyHeader();
+                options.SetIsOriginAllowed((host) => true);
+                options.AllowCredentials();
+            });
             // Add these before app.UseRouting();
             app.UseDefaultFiles();
             app.UseStaticFiles();
             if (!env.IsDevelopment())
             {
-                app.UseSpaStaticFiles();
+            //    app.UseSpaStaticFiles();
             }
         
             app.UseOpenApi();
             app.UseSwaggerUi3();
+        
 
 
 
 
-
-            app.UseSpa(spa =>
+            /* app.UseSpa(spa =>
                       {
                           // To learn more about options for serving a SPA app from ASP.NET Core,
                           // see https://go.microsoft.com/fwlink/?linkid=864501
 
-                          spa.Options.SourcePath = "ClientApp";
+                          spa.Options.SourcePath = "../wwwroot";
 
-                          if (env.IsDevelopment())
+                           if (env.IsDevelopment())
                           {
                               var port = Environment.GetEnvironmentVariable("PORT") ?? "4200";
                               spa.UseProxyToSpaDevelopmentServer($"http://localhost:{port}");
@@ -73,10 +81,12 @@ namespace Library
                           else
                           {
                               // HTTPS redirection will break Rollup's livereload
-                              app.UseHttpsRedirection();
-                          }
-                      });
-            
+                              //app.UseHttpsRedirection();
+                          } 
+                      }); */
+            app.UseRouting();
+            app.UseEndpoints(e => e.MapControllers());
+
         }
         
     }

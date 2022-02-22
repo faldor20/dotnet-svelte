@@ -2,17 +2,32 @@
 	import * as API from"../Api" 
 	import { userId } from "../stores";
 	import Book from "../components/book.svelte";
-import { loop_guard } from "svelte/internal";
+	import { loop_guard } from "svelte/internal";
 
 	let bookTitle:string;
 	const api=new API.Api()
 	let results:API.BookListing[]=[]
 	function doSearch() {
-		api.api.libraryGetBooksByTitle({title:bookTitle})
+		api.api.libraryGetBooksByTitle(bookTitle)
 		.then( x=>results=x.data)
 	}
-	function loanBook(bookId:number) {
-		api.api.libraryLendBook($userId,bookId).then(x=>console.log("loan res:",x)).catch(x=>console.log("loan res:",x));
+	async function loanBook(listingId:number,bookId:number) {
+		let lend=await api.api.libraryLendBook($userId,bookId);
+		if (lend.ok) {
+			console.log("loan res:",lend);
+			let a= await api.api.libraryGetLoanInfo(bookId);
+			if(a.ok){
+				results.find(x=>x.id==listingId).books=a.data;
+				console.log("Got new loaninfo")
+			}
+			else{
+				console.error("Could not get new Listing Info")
+			}
+		}
+		else {
+			console.error("lending error: ",lend.statusText)
+		}
+		
 		console.log("done Loaning");
 		
 	}
@@ -23,13 +38,19 @@ import { loop_guard } from "svelte/internal";
 	<h1>Book title search </h1>
     <input bind:value={bookTitle}/>
 	<button on:click={doSearch}>Search</button>
-	{#each results as book }
-		<Book book={book} loan={loanBook}/>
-	{/each}
+	<div class="bookList">
+
+		{#each results as book }
+		<Book book={book} loan={x=>loanBook(book.id,x)}/>
+		{/each}
+	</div>
 
 </main>
 
 <style>
+	.bookList{
+		@apply flex content-center justify-center;
+	}
 	main {
 		text-align: center;
 		padding: 1em;

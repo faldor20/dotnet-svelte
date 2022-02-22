@@ -45,7 +45,8 @@ namespace Library.Models
     public class Book
     {
         public int Id { get; set; }
-        public BookListing Listing { get; set; }
+        public int BookListingId { get; set; }
+        public BookListing BookListing { get; set; }
 
         public LoanInfo? LoanInfo { get; set; }
 

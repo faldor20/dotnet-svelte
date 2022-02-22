@@ -22,7 +22,10 @@ export interface BookListing {
 export interface Book {
   /** @format int32 */
   id?: number;
-  listing?: BookListing;
+
+  /** @format int32 */
+  bookListingId?: number;
+  bookListing?: BookListing;
   loanInfo?: LoanInfo | null;
 }
 
@@ -261,14 +264,42 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      *
      * @tags Library
      * @name LibraryGetBooksByTitle
-     * @request GET:/api/Library
+     * @request GET:/api/Library/listings/{title}
      */
-    libraryGetBooksByTitle: (query?: { title?: string | null }, params: RequestParams = {}) =>
+    libraryGetBooksByTitle: (title: string | null, params: RequestParams = {}) =>
       this.request<BookListing[], any>({
-        path: `/api/Library`,
+        path: `/api/Library/listings/${title}`,
         method: "GET",
-        query: query,
         format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Library
+     * @name LibraryGetLoanInfo
+     * @request GET:/api/Library/loanInfo/{bookListingId}
+     */
+    libraryGetLoanInfo: (bookListingId: number, params: RequestParams = {}) =>
+      this.request<Book[], any>({
+        path: `/api/Library/loanInfo/${bookListingId}`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Library
+     * @name LibraryGetCover
+     * @request GET:/api/Library/cover/{listingId}
+     */
+    libraryGetCover: (listingId: number, params: RequestParams = {}) =>
+      this.request<File, any>({
+        path: `/api/Library/cover/${listingId}`,
+        method: "GET",
         ...params,
       }),
 
@@ -307,11 +338,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @name LibraryGetUserIds
      * @request GET:/api/Library/userIds
      */
-    libraryGetUserIds: (query?: { bookId?: number }, params: RequestParams = {}) =>
+    libraryGetUserIds: (params: RequestParams = {}) =>
       this.request<number[], any>({
         path: `/api/Library/userIds`,
         method: "GET",
-        query: query,
         format: "json",
         ...params,
       }),
