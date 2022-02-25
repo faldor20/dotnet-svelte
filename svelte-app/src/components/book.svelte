@@ -3,36 +3,39 @@
     import { api } from "../stores";
     
     export let book:BookListing;
-    export let loan:(bookId:number)=>void;
-    let available=getAvailable(book.books);
-    let canReserve=available.length>0;
-    console.log("canReserve?",canReserve);
-
-    function getAvailable(books:Book[]){
-        console.log("books:",books);
-        return books.filter((book )=>book.loanInfo==null);
-    }
+    
 
     let imagePath=api.baseUrl+"/api/Library/cover/"+book.id
 </script>
 
 <div class="card" >
     <img src={imagePath} alt="Book cover" >
-    <div>
-        <div>
+    <div class="cardBody">
+        <div >
             <span class="title">{book.title}</span>
             <span class="author"> by: {book.author}</span>
         </div>
-        <p class="description">{book.description}</p>
+        <p  class="description">{book.description}</p>
     </div>
-    <button class="loan" disabled={!canReserve} on:click={()=>{loan(available[0].id);console.log("hey")}}>Loan</button>
+    <slot class="float-right" name="end"></slot>
+    
 </div>
 
 <style lang="postcss">
-    
+    .grid-auto-3{
+        grid-template-columns: repeat(3,auto);
+    }
+    .cardBody{
+        @apply h-24  overflow-ellipsis overflow-hidden line-clamp-3 md:max-h-full md:line-clamp-4;
+        //max-height: 70%;
+    }
     .card{
+        
         width: fit-content;
-        @apply flex-shrink self-center h-40 flex flex-row shadow-xl rounded max-w-5xl;
+        @apply overflow-ellipsis overflow-hidden self-center h-40   shadow-xl rounded md:max-w-5xl;
+        @apply grid  grid-flow-row-dense  grid-cols-auto-2  md:grid-cols-auto-3;
+
+
     }
     .title{
         @apply font-bold text-xl ;
@@ -42,9 +45,12 @@
     }
     .description{
         @apply overflow-hidden overflow-ellipsis;
+        
     }
     .card>img{
-        @apply p-1;
+        @apply p-1 max-h-full h-40;
+        @apply md:w-auto row-span-2;
+        object-fit:contain;
     }
     
 	button.loan{

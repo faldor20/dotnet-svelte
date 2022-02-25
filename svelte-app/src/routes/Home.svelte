@@ -2,7 +2,7 @@
 	import { each, onMount } from "svelte/internal";
 	import { Api } from "../Api";
 
-	import { userId } from "../stores";
+	import { userData } from "../stores";
 	export let name: string;
 	let id = 0;
 	let userIds: number[] = [];
@@ -16,6 +16,9 @@
 			})
 			.catch((x) => console.error("failed getting userId ", x));
 	});
+	async function setUser(userId:number) {
+		await api.api.libraryUserData(userId).then(x=>userData.set(x.data))
+	}
 </script>
 
 <main>
@@ -25,7 +28,7 @@
 			<option value={id}>{id.toString()}</option>
 		{/each}
 	</select>
-	<button on:click={() => userId.set(id)}>SetId</button>
+	<button on:click={() => setUser(id)}>SetId</button>
 	<p>
 		Visit the <a href="https://svelte.dev/tutorial">Svelte tutorial</a> to learn
 		how to build Svelte apps.
@@ -36,7 +39,8 @@
 	main {
 		text-align: center;
 		padding: 1em;
-		max-width: 240px;
+		//max-width: 240px;
+		max-width:none;
 		margin: 0 auto;
 	}
 

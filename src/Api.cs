@@ -14,13 +14,17 @@ namespace Library.Api
         private readonly IConfiguration _configuration;
         private readonly LibraryContext _context;
         private readonly Paths _paths;
+        private readonly Configuration.Library _libraryConfig;
 
         public LibraryController(IConfiguration configuration,LibraryContext context)
         {
             _context = context;
             _configuration = configuration;
             var paths = new Paths();
+            var libraryConfig = new Configuration.Library();
+            _configuration.Bind(libraryConfig);
             _configuration.Bind(paths);
+            _libraryConfig = libraryConfig;
             _paths = paths;
 
         }
@@ -43,7 +47,11 @@ namespace Library.Api
             Byte[] b = await System.IO.File.ReadAllBytesAsync(imagePath);            
             return File(b, "image/jpeg");
         }
-
+        [HttpGet("UserData/{UserId:int}")]
+        public User UserData(int userId)
+        {
+            return _context.Users.Include("LoanedBooks.BookListing").Include("LoanedBooks.LoanInfo").Where(x=>x.Id==userId).First();
+        }
         [HttpPost("lend/{userId:int}/{bookId:int}")]   // GET /api/test2/xyz
         public async  Task<IActionResult> LendBook(int userId, int bookId)
         {
@@ -54,8 +62,8 @@ namespace Library.Api
             var user = await _context.Users.FindAsync(userId);
             if (user is null) return NotFound($"Could not find userID{userId}");
             if (user.LoanedBooks.Find(x =>x.BookListingId==book.BookListingId) is not null) return Conflict("you have already reserved that book");
-            
-            book.LoanInfo = new LoanInfo { LoanedDate= DateOnly.FromDateTime(DateTime.Now),LoanedUser= user};
+            var nowDate = DateOnly.FromDateTime(DateTime.Now);
+            book.LoanInfo = new LoanInfo { LoanedDate = nowDate, LoanedUser = user, DueDate = nowDate.AddDays(_libraryConfig.LoanDays) };
             _context.Books.Update(book);
             user.LoanedBooks.Add(book);
             _context.Users.Update(user);

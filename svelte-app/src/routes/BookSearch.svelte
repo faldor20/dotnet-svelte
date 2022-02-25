@@ -1,36 +1,21 @@
 <script lang="ts">
 	import * as API from"../Api" 
-	import { userId } from "../stores";
+	import { userData } from "../stores";
 	import Book from "../components/book.svelte";
 	import { loop_guard } from "svelte/internal";
+	import LoanButton from "../components/loanButton.svelte";
+	import { push } from "svelte-spa-router";
+	import type { User } from "../Api";
 
 	let bookTitle:string;
+	let thisuserData = ($userData??push('/error/user')) as User;
 	const api=new API.Api()
-	let results:API.BookListing[]=[]
+	let listings:API.BookListing[]=[]
 	function doSearch() {
 		api.api.libraryGetBooksByTitle(bookTitle)
-		.then( x=>results=x.data)
+		.then( x=>listings=x.data)
 	}
-	async function loanBook(listingId:number,bookId:number) {
-		let lend=await api.api.libraryLendBook($userId,bookId);
-		if (lend.ok) {
-			console.log("loan res:",lend);
-			let a= await api.api.libraryGetLoanInfo(bookId);
-			if(a.ok){
-				results.find(x=>x.id==listingId).books=a.data;
-				console.log("Got new loaninfo")
-			}
-			else{
-				console.error("Could not get new Listing Info")
-			}
-		}
-		else {
-			console.error("lending error: ",lend.statusText)
-		}
-		
-		console.log("done Loaning");
-		
-	}
+	
 	
 </script>
 
@@ -39,9 +24,13 @@
     <input bind:value={bookTitle}/>
 	<button on:click={doSearch}>Search</button>
 	<div class="bookList">
-
-		{#each results as book }
-		<Book book={book} loan={x=>loanBook(book.id,x)}/>
+		{#each listings as listing }
+		<Book book={listing} > 
+			<svelte:fragment slot="end">
+				<LoanButton listing={listing} userData={thisuserData}/>
+			</svelte:fragment>
+		</Book> 
+			
 		{/each}
 	</div>
 
@@ -53,8 +42,9 @@
 	}
 	main {
 		text-align: center;
+
 		padding: 1em;
-		max-width: 240px;
+		max-width: none;
 		margin: 0 auto;
 	}
 
@@ -71,8 +61,9 @@
 		@apply border-2 border-gray-600;
 	}
 
-	@media (min-width: 640px) {
+	@media (max-width: 900px) {
 		main {
+			margin: 0 0;
 			max-width: none;
 		}
 	}

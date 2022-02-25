@@ -1,4 +1,4 @@
-import svelte from 'rollup-plugin-svelte';
+import svelte from 'rollup-plugin-svelte-hot'
 import commonjs from '@rollup/plugin-commonjs';
 import resolve from '@rollup/plugin-node-resolve';
 import livereload from 'rollup-plugin-livereload';
@@ -6,8 +6,15 @@ import { terser } from 'rollup-plugin-terser';
 import sveltePreprocess from 'svelte-preprocess';
 import typescript from '@rollup/plugin-typescript';
 import css from 'rollup-plugin-css-only';
+import hmr from 'rollup-plugin-hot'
 
-const production = !process.env.ROLLUP_WATCH;
+const isWatch = !!process.env.ROLLUP_WATCH
+const isNollup = !!process.env.NOLLUP
+const isLiveReload = !!process.env.LIVERELOAD
+const isDev = isWatch || isLiveReload
+const production = !isDev
+
+const isHot = isWatch && !isLiveReload
 
 function serve() {
 	let server;
@@ -41,6 +48,21 @@ export default {
 
 	plugins: [
 		svelte({
+			hot: isHot && {
+				// Optimistic will try to recover from runtime
+				// errors during component init
+				optimistic: true,
+				// Turn on to disable preservation of local component
+				// state -- i.e. non exported `let` variables
+				noPreserveState: false,
+				
+				// See docs of rollup-plugin-svelte-hot for all available options:
+				//
+				// https://github.com/rixo/rollup-plugin-svelte-hot#usage
+			},
+			css: css => {
+				css.write(isNollup ? 'build/bundle.css' : 'bundle.css')
+			}, 
 			preprocess: sveltePreprocess({
 				sourceMap: !production,
 				postcss: {
@@ -51,8 +73,12 @@ export default {
 				},}),
 			compilerOptions: {
 				// enable run-time checks when not in production
-				dev: !production
-			}
+				dev: !production,
+				// we'll extract any component CSS out into
+				// a separate file - better for performance
+				// NOTE when hot option is enabled, a blank file will be written to
+				// avoid CSS rules conflicting with HMR injected ones
+			},
 		}),
 		// we'll extract any component CSS out into
 		// a separate file - better for performance
@@ -75,15 +101,32 @@ export default {
 
 		// In dev mode, call `npm run start` once
 		// the bundle has been generated
-		!production && serve(),
+		isDev && !isNollup && serve(),
+
 
 		// Watch the `public` directory and refresh the
 		// browser on changes when not in production
-		!production && livereload('wwwroot'),
+		isLiveReload && livereload('wwwroot'),
 
 		// If we're building for production (npm run build
 		// instead of npm run dev), minify
-		production && terser()
+		production && terser(),
+		hmr({
+			 public: 'public',
+			 inMemory: true,
+
+			 // Default host for the HMR server is localhost, change this option if
+			 // you want to serve over the network
+			 // host: '0.0.0.0',
+			 // You can also change the default HMR server port, if you fancy
+			 // port: '12345'
+			
+			 // This is needed, otherwise Terser (in npm run build) chokes
+			 // on import.meta. With this option, the plugin will replace
+			 // import.meta.hot in your code with module.hot, and will do
+			 // nothing else.
+			 compatModuleHot: !isHot,
+		 }),
 	],
 	watch: {
 		clearScreen: false

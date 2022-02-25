@@ -57,6 +57,7 @@ namespace Library.Models
         [Key]
         public int Id { get; set; }
         public DateOnly LoanedDate { get; set; }
+        public DateOnly DueDate{ get; set; }
         public User LoanedUser { get; set; }
 
     }

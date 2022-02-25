@@ -9,9 +9,11 @@
  * ---------------------------------------------------------------
  */
 
+import type { number } from "fp-ts";
+
 export interface BookListing {
   /** @format int32 */
-  id?: number;
+  id: number;
   description?: string;
   title?: string;
   author?: string;
@@ -21,26 +23,35 @@ export interface BookListing {
 
 export interface Book {
   /** @format int32 */
-  id?: number;
+  id: number;
 
   /** @format int32 */
-  bookListingId?: number;
+  bookListingId: number;
   bookListing?: BookListing;
-  loanInfo?: LoanInfo | null;
+  loanInfo?: LoanInfo;
 }
 
 export interface LoanInfo {
   /** @format int32 */
-  id?: number;
+  id: number;
 
   /** @format date */
-  loanedDate?: string;
-  loanedUser?: User;
+  loanedDate: NetDate;
+  dueDate:NetDate
+  loanedUser: User;
 }
+ export interface NetDate{
+  year:number;
+  month:number;
+  day:number;
+  dayOfWeek:number;
+  dayOfYear:number;
+  dayNumber:number;
 
+} 
 export interface User {
   /** @format int32 */
-  id?: number;
+  id: number;
   loanedBooks?: Book[];
 }
 
@@ -89,7 +100,7 @@ export enum ContentType {
 }
 
 export class HttpClient<SecurityDataType = unknown> {
-  public baseUrl: string = "http://localhost:5000";
+  public baseUrl: string = "";
   private securityData: SecurityDataType | null = null;
   private securityWorker?: ApiConfig<SecurityDataType>["securityWorker"];
   private abortControllers = new Map<CancelToken, AbortController>();
@@ -300,6 +311,21 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       this.request<File, any>({
         path: `/api/Library/cover/${listingId}`,
         method: "GET",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Library
+     * @name LibraryUserData
+     * @request GET:/api/Library/UserData/{UserId}
+     */
+    libraryUserData: (userId: number, params: RequestParams = {}) =>
+      this.request<User, any>({
+        path: `/api/Library/UserData/${userId}`,
+        method: "GET",
+        format: "json",
         ...params,
       }),
 
