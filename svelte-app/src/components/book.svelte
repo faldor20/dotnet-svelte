@@ -26,15 +26,15 @@
         grid-template-columns: repeat(3,auto);
     }
     .cardBody{
-        @apply h-24  overflow-ellipsis overflow-hidden line-clamp-3 md:max-h-full md:line-clamp-4;
+        @apply  line-clamp-3 md:max-h-full md:line-clamp-5;
+        height: 100%;
         //max-height: 70%;
     }
     .card{
         
         width: fit-content;
         @apply overflow-ellipsis overflow-hidden self-center h-40   shadow-xl rounded md:max-w-5xl;
-        @apply grid  grid-flow-row-dense  grid-cols-auto-2  md:grid-cols-auto-3;
-
+        @apply grid p-1  grid-flow-row-dense  grid-cols-auto-2  md:grid-cols-auto-3;
 
     }
     .title{
@@ -48,15 +48,9 @@
         
     }
     .card>img{
-        @apply p-1 max-h-full h-40;
-        @apply md:w-auto row-span-2;
+        @apply  max-h-full h-40;
+        @apply md:w-auto row-span-2 md:row-span-1;
         object-fit:contain;
     }
     
-	button.loan{
-        @apply self-center max-h-10 rounded-b shadow-sm;
-    }
-    button.loan:disabled{
-        @apply bg-gray-600;
-    }
 </style>

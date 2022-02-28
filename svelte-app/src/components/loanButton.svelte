@@ -44,7 +44,6 @@
 </script>
 
 <button
-    class="loan"
     disabled={!canReserve}
     on:click={() => {
         loanBook(userData.id, available[0]);
@@ -55,6 +54,14 @@
 </button>
 
 <style>
-    button {
+
+	button{
+        @apply self-center p-1 rounded-b shadow-sm grid;
+        margin-left: auto;
+        width: fit-content;
+        height: fit-content;
+    }
+    button:disabled{
+        @apply bg-gray-600;
     }
 </style>
