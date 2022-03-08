@@ -1,0 +1,9 @@
+* Library.
+A simple toy library frontend built to re-familiarize myself with some old things and learn some new ones too.
+** Tech
+- svelte for the frontend being served and bundled by vite.
+- tailwind for easy css
+- c# asp.net backend using EF core for DB interaction.
+** Running.
+Presently to develop you run the dotnet backend using ~dotnet run~ and the web host by running ~pnpm run vite~ from within the svelte-app folder.
+This split system allows us to use vite's support for hot module reloading.
